@@ -24,6 +24,7 @@ class ViewController: UIViewController {
             self?.imageView.image = image
             self?.dismiss(animated: true, completion: nil)
         }
+        cameraViewController.cameraOverlay.isHidden = true
         
         present(cameraViewController, animated: true, completion: nil)
     }
