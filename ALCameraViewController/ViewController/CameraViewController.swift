@@ -180,8 +180,13 @@ public class CameraViewController: UIViewController {
         return UIStatusBarAnimation.slide
     }
     
-    public func setCameraOverlayHidden(hidden: Bool) {
-        cameraOverlay.isHidden = hidden
+    public var isCameraOverlayHidden: Bool {
+        get {
+            return cameraOverlay.isHidden
+        }
+        set(value) {
+            cameraOverlay.isHidden = value
+        }
     }
     
     /**
