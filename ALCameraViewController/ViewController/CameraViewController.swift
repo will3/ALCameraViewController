@@ -180,6 +180,10 @@ public class CameraViewController: UIViewController {
         return UIStatusBarAnimation.slide
     }
     
+    public func setCameraOverlayHidden(hidden: Bool) {
+        cameraOverlay.isHidden = hidden
+    }
+    
     /**
      * Configure the background of the superview to black
      * and add the views on this superview. Then, request
