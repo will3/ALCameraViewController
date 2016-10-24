@@ -25,6 +25,7 @@ class ViewController: UIViewController {
             self?.dismiss(animated: true, completion: nil)
         }
         cameraViewController.cameraOverlay.isHidden = true
+        cameraViewController.shouldSaveImageToLibrary = false
         
         present(cameraViewController, animated: true, completion: nil)
     }

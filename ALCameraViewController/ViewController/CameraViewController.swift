@@ -23,7 +23,7 @@ public extension CameraViewController {
 
         imagePicker.onSelectionComplete = { [weak imagePicker] asset in
             if let asset = asset {
-                let confirmController = ConfirmViewController(asset: asset, allowsCropping: croppingEnabled)
+                let confirmController = ConfirmViewController(asset: asset, fetchedImage: nil, allowsCropping: croppingEnabled)
                 confirmController.onComplete = { [weak imagePicker] image, asset in
                     if let image = image, let asset = asset {
                         completion(image, asset)
@@ -81,6 +81,8 @@ public class CameraViewController: UIViewController {
     var cameraOverlayEdgeTwoConstraint: NSLayoutConstraint?
     var cameraOverlayWidthConstraint: NSLayoutConstraint?
     var cameraOverlayCenterConstraint: NSLayoutConstraint?
+    
+    public var shouldSaveImageToLibrary = true
     
     let cameraView : CameraView = {
         let cameraView = CameraView()
@@ -494,10 +496,15 @@ public class CameraViewController: UIViewController {
     }
     
     internal func saveImage(image: UIImage) {
+        if !shouldSaveImageToLibrary {
+            self.layoutCameraResult(asset: nil, image: image)
+            return
+        }
+        
         _ = SingleImageSaver()
             .setImage(image)
             .onSuccess { asset in
-                self.layoutCameraResult(asset: asset)
+                self.layoutCameraResult(asset: asset, image: nil)
             }
             .onFailure { error in
                 self.toggleButtons(enabled: true)
@@ -548,16 +555,16 @@ public class CameraViewController: UIViewController {
         flashButton.isHidden = cameraView.currentPosition == AVCaptureDevicePosition.front
     }
     
-    internal func layoutCameraResult(asset: PHAsset) {
+    internal func layoutCameraResult(asset: PHAsset?, image: UIImage?) {
         cameraView.stopSession()
-        startConfirmController(asset: asset)
+        startConfirmController(asset: asset, image: image)
         toggleButtons(enabled: true)
     }
     
-    private func startConfirmController(asset: PHAsset) {
-        let confirmViewController = ConfirmViewController(asset: asset, allowsCropping: allowCropping)
+    private func startConfirmController(asset: PHAsset?, image: UIImage?) {
+        let confirmViewController = ConfirmViewController(asset: asset, fetchedImage: image, allowsCropping: allowCropping)
         confirmViewController.onComplete = { image, asset in
-            if let image = image, let asset = asset {
+            if image != nil || asset != nil {
                 self.onCompletion?(image, asset)
             } else {
                 self.dismiss(animated: true, completion: nil)

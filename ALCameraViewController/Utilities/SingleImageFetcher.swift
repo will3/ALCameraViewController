@@ -22,6 +22,8 @@ public class SingleImageFetcher {
     private var targetSize = PHImageManagerMaximumSize
     private var cropRect: CGRect?
     
+    private var image: UIImage?
+    
     public init() { }
     
     public func onSuccess(_ success: @escaping SingleImageFetcherSuccess) -> Self {
@@ -34,8 +36,9 @@ public class SingleImageFetcher {
         return self
     }
     
-    public func setAsset(_ asset: PHAsset) -> Self {
+    public func setAsset(_ asset: PHAsset?, image: UIImage?) -> Self {
         self.asset = asset
+        self.image = image
         return self
     }
     
@@ -50,30 +53,34 @@ public class SingleImageFetcher {
     }
     
     public func fetch() -> Self {
+        if let image = image {
+            _cropImage(image)
+            return self
+        }
+        
+        guard let asset = asset else {
+            let error = errorWithKey("error.cant-fetch-photo", domain: self.errorDomain)
+            self.failure?(error)
+            return self
+        }
+        
         _ = PhotoLibraryAuthorizer { error in
             if error == nil {
-                self._fetch()
+                self._fetchAsset(asset)
             } else {
                 self.failure?(error!)
             }
         }
+        
         return self
     }
     
-    private func _fetch() {
-    
-        guard let asset = asset else {
-            let error = errorWithKey("error.cant-fetch-photo", domain: errorDomain)
-            failure?(error)
-            return
-        }
-        
+    private func _fetchAsset(_ asset: PHAsset) {
         let options = PHImageRequestOptions()
         options.deliveryMode = .highQualityFormat
         options.isNetworkAccessAllowed = true
-
+        
         if let cropRect = cropRect {
-
             options.normalizedCropRect = cropRect
             options.resizeMode = .exact
             
@@ -91,6 +98,37 @@ public class SingleImageFetcher {
                 let error = errorWithKey("error.cant-fetch-photo", domain: self.errorDomain)
                 self.failure?(error)
             }
+        }
+    }
+    
+    private func _cropImage(_ image: UIImage) {
+        let error = errorWithKey("error.cant-fetch-photo", domain: self.errorDomain)
+        
+        guard let cgImage = image.cgImage else {
+            self.failure?(error)
+            return
+        }
+        
+        if let cropRect = cropRect {
+            var cropFrame = cropRect
+            cropFrame.origin.x *= CGFloat(cgImage.width)
+            cropFrame.origin.y *= CGFloat(cgImage.height)
+            cropFrame.size.width *= CGFloat(cgImage.width)
+            cropFrame.size.height *= CGFloat(cgImage.height)
+            
+            guard let croppedImageCi = cgImage.cropping(to: cropFrame) else {
+                self.failure?(error)
+                return
+            }
+            
+            let croppedImage = UIImage(
+                cgImage: croppedImageCi,
+                scale: image.scale,
+                orientation: image.imageOrientation)
+            
+            self.success?(croppedImage)
+        } else {
+            self.success?(image)
         }
     }
 }

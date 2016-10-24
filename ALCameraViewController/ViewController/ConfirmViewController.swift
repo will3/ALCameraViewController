@@ -24,11 +24,13 @@ public class ConfirmViewController: UIViewController, UIScrollViewDelegate {
     
     public var onComplete: CameraViewCompletion?
     
-    var asset: PHAsset!
+    var asset: PHAsset?
+    var fetchedImage: UIImage?
     
-    public init(asset: PHAsset, allowsCropping: Bool) {
+    public init(asset: PHAsset?, fetchedImage: UIImage?, allowsCropping: Bool) {
         self.allowsCropping = allowsCropping
         self.asset = asset
+        self.fetchedImage = fetchedImage
         super.init(nibName: "ConfirmViewController", bundle: CameraGlobals.shared.bundle)
     }
     
@@ -55,16 +57,12 @@ public class ConfirmViewController: UIViewController, UIScrollViewDelegate {
         
         cropOverlay.isHidden = true
         
-        guard let asset = asset else {
-            return
-        }
-        
         let spinner = showSpinner()
         
         disable()
 
         _ = SingleImageFetcher()
-            .setAsset(asset)
+            .setAsset(asset, image: fetchedImage)
             .setTargetSize(largestPhotoSize())
             .onSuccess { image in
                 self.configureWithImage(image)
@@ -215,6 +213,7 @@ public class ConfirmViewController: UIViewController, UIScrollViewDelegate {
         let spinner = showSpinner()
 
         var fetcher = SingleImageFetcher()
+            .setAsset(asset, image: fetchedImage)
             .onSuccess { image in
                 self.onComplete?(image, self.asset)
                 self.hideSpinner(spinner)
@@ -224,7 +223,6 @@ public class ConfirmViewController: UIViewController, UIScrollViewDelegate {
                 self.hideSpinner(spinner)
                 self.showNoImageScreen(error)
             }
-            .setAsset(asset)
         
         if allowsCropping {
             
