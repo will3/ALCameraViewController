@@ -165,8 +165,11 @@ public class CameraViewController: UIViewController {
         return view
     }()
   
-    public init(croppingEnabled: Bool, allowsLibraryAccess: Bool = true, completion: @escaping CameraViewCompletion) {
+    public init() {
         super.init(nibName: nil, bundle: nil)
+    }
+    
+    public func configure(croppingEnabled: Bool, allowsLibraryAccess: Bool = true, completion: @escaping CameraViewCompletion) {
         onCompletion = completion
         allowCropping = croppingEnabled
         cameraOverlay.isHidden = !allowCropping
