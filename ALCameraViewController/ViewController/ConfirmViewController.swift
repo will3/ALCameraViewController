@@ -17,10 +17,18 @@ public class ConfirmViewController: UIViewController, UIScrollViewDelegate {
     @IBOutlet weak var cancelButton: UIButton!
     @IBOutlet weak var confirmButton: UIButton!
     @IBOutlet weak var centeringView: UIView!
+    @IBOutlet weak var briefToggleContainer: UIView!
+    @IBOutlet weak var briefToggle: UISwitch!
+    @IBOutlet weak var controlBackgroundView: UIView!
     
     var allowsCropping: Bool = false
     var verticalPadding: CGFloat = 30
     var horizontalPadding: CGFloat = 30
+    
+    public var shouldShowAddPhotoToBrief = false
+    public var isBriefToggleOn : Bool {
+        return briefToggle.isOn
+    }
     
     public var onComplete: CameraViewCompletion?
     
@@ -73,6 +81,21 @@ public class ConfirmViewController: UIViewController, UIScrollViewDelegate {
                 self.hideSpinner(spinner)
             }
             .fetch()
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(ConfirmViewController.onBriefToggleContainerTapped(gesture:)))
+        briefToggleContainer.addGestureRecognizer(tapGesture)
+        
+        if shouldShowAddPhotoToBrief {
+            controlBackgroundView.isHidden = false
+            briefToggleContainer.isHidden = false
+        } else {
+            controlBackgroundView.isHidden = true
+            briefToggleContainer.isHidden = true
+        }
+    }
+    
+    func onBriefToggleContainerTapped(gesture: UITapGestureRecognizer) {
+        briefToggle.setOn(!briefToggle.isOn, animated: true)
     }
     
     public override func viewWillLayoutSubviews() {

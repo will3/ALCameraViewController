@@ -84,6 +84,14 @@ public class CameraViewController: UIViewController {
     
     public var shouldSaveImageToLibrary = true
     
+    public var shouldShowAddPhotoToBrief = false
+    
+    var lastConfirmViewController : ConfirmViewController?
+    
+    public var isBriefToggleOn : Bool {
+        return lastConfirmViewController?.isBriefToggleOn ?? false
+    }
+    
     let cameraView : CameraView = {
         let cameraView = CameraView()
         cameraView.translatesAutoresizingMaskIntoConstraints = false
@@ -571,7 +579,9 @@ public class CameraViewController: UIViewController {
             }
         }
         confirmViewController.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+        confirmViewController.shouldShowAddPhotoToBrief = shouldShowAddPhotoToBrief
         present(confirmViewController, animated: true, completion: nil)
+        lastConfirmViewController = confirmViewController
     }
     
 }
