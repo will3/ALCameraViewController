@@ -86,6 +86,8 @@ public class CameraViewController: UIViewController {
     
     public var shouldShowAddPhotoToBrief = false
     
+    public var addPhotoToBriefToggled = false
+    
     var lastConfirmViewController : ConfirmViewController?
     
     public var isBriefToggleOn : Bool {
@@ -583,6 +585,8 @@ public class CameraViewController: UIViewController {
         }
         confirmViewController.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
         confirmViewController.shouldShowAddPhotoToBrief = shouldShowAddPhotoToBrief
+        confirmViewController.loadViewIfNeeded()
+        confirmViewController.isBriefToggleOn = addPhotoToBriefToggled
         present(confirmViewController, animated: true, completion: nil)
         lastConfirmViewController = confirmViewController
     }

@@ -27,7 +27,12 @@ public class ConfirmViewController: UIViewController, UIScrollViewDelegate {
     
     public var shouldShowAddPhotoToBrief = false
     public var isBriefToggleOn : Bool {
-        return briefToggle.isOn
+        get {
+            return briefToggle.isOn
+        }
+        set(v) {
+            briefToggle.isOn = v;
+        }
     }
     
     public var onComplete: CameraViewCompletion?
