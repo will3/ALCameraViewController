@@ -585,9 +585,8 @@ public class CameraViewController: UIViewController {
         }
         confirmViewController.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
         confirmViewController.shouldShowAddPhotoToBrief = shouldShowAddPhotoToBrief
-        confirmViewController.loadViewIfNeeded()
-        confirmViewController.isBriefToggleOn = addPhotoToBriefToggled
         present(confirmViewController, animated: true, completion: nil)
+        confirmViewController.isBriefToggleOn = addPhotoToBriefToggled
         lastConfirmViewController = confirmViewController
     }
     
